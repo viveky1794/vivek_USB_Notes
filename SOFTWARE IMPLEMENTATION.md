@@ -9,3 +9,12 @@
 +   http://www.keil.com/download/docs/361.asp
 
 +   https://www.youtube.com/watch?v=aNJYVY3OhMU
+
+
++   Token Packet
+ +   Start of Frame packet
+  +  Data packet
+   + Acknowledge Packet
+   
+   
+   + 
