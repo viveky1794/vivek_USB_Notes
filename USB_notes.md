@@ -13,7 +13,9 @@
   devices assert 5 V on D+ . The connection signals are detected by the Hub and reported to the Host.
   Once a Device is detected, the Host issues a **RESET command** to the Device.
 
-+ ### RESET command :[Link](https://microchipdeveloper.com/usb:reset-suspend-resume)
++ [RESET command](https://microchipdeveloper.com/usb:reset-suspend-resume)
++ [Suspent Command](https://microchipdeveloper.com/usb:reset-suspend-resume)
++ [Resume Command](https://microchipdeveloper.com/usb:reset-suspend-resume)
  
 
 ## Default State :
