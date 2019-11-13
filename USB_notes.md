@@ -44,7 +44,7 @@
   using the active configuration.
   
   
-**===============================================================================================**
+**=====================================================================================**
 
 # Commonly used USB Speed Specifications :
   ![alt text](https://www.electronicdesign.com/sites/electronicdesign.com/files/uploads/2015/02/0216_TI_USBtypeC_No2_Table1.gif)
@@ -59,6 +59,6 @@ This is on D- for a low speed device, and on D+ for a full speed device.
 The host can determine the required speed by observing which line is pulled high.
 ![alt text](http://www.usbmadesimple.co.uk/ums_j_speed_r.jpg)
 
-+ ### BUS States :
++ **[BUS States:]**(http://www.usbmadesimple.co.uk/ums_3.htm)
 
-![alt text]()
+
