@@ -44,10 +44,21 @@
   using the active configuration.
   
   
-**===============================================================================================================**
+**===============================================================================================**
 
 # Commonly used USB Speed Specifications :
   ![alt text](https://www.electronicdesign.com/sites/electronicdesign.com/files/uploads/2015/02/0216_TI_USBtypeC_No2_Table1.gif)
   
-  
-  
+## Speed Identification :
+  At the device end of the link a 1.5 kohm resistor pulls one of the lines up to a 3.3V supply derived from VBUS.
+
+This is on D- for a low speed device, and on D+ for a full speed device.
+
+(A high speed device will initially present itself as a full speed device with the pull-up resistor on D+.)
+
+The host can determine the required speed by observing which line is pulled high.
+![alt text](http://www.usbmadesimple.co.uk/ums_j_speed_r.jpg)
+
++ ### BUS States :
+
+![alt text]()
