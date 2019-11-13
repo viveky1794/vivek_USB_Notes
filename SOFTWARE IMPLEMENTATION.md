@@ -10,6 +10,8 @@
 
 +   https://www.youtube.com/watch?v=aNJYVY3OhMU
 
++   https://microchipdeveloper.com/usb:enumeration
+
 
 +   Token Packet
  +   Start of Frame packet
