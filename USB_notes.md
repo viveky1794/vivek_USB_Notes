@@ -13,21 +13,8 @@
   devices assert 5 V on D+ . The connection signals are detected by the Hub and reported to the Host.
   Once a Device is detected, the Host issues a **RESET command** to the Device.
 
-+ ### RESET command :
-  During the enumeration process the Host issues a Reset signal to the Device. This USB Reset is not
-  to be confused with a hardware or power-on reset. The purpose of the USB Reset is to set the software
-  state of the Device so enumeration can proceed.
-
-  Devices recognize a Reset condition when both D- and D+ are both held low (SE0) for 10 ms.
-  In some cases the Device is able to detect the Reset within 2.5 µs, however the Host will maintain
-  the Reset condition for the entire 10 ms.
-
-![alt text](https://microchip.wikidot.com/local--files/usb:reset-suspend-resume/reset-signal.svg)
-
-  To initiate a reset, D+ and D- are held low by the Hub. Having the Hub hold the data lines low allows
-  the Host to continually service the other devices and avoid having Devices enter suspend mode for lack
-  of activity on D+ and D-. The Host causes the Hub to reset a Device by issuing a SET_PORT_FEATURE(PORT_RESET)
-  control command to the Hub.
++ ### RESET command :[Link](https://microchipdeveloper.com/usb:reset-suspend-resume)
+ 
 
 ## Default State :
   When a RESET control signal sequence is received, the Device will manage its load, per specification, to enumerate.
@@ -59,6 +46,6 @@ This is on D- for a low speed device, and on D+ for a full speed device.
 The host can determine the required speed by observing which line is pulled high.
 ![alt text](http://www.usbmadesimple.co.uk/ums_j_speed_r.jpg)
 
-+ **[BUS States:]**(http://www.usbmadesimple.co.uk/ums_3.htm)
++ [BUS States](http://www.usbmadesimple.co.uk/ums_3.htm)
 
 
