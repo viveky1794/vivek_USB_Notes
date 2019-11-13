@@ -1,4 +1,17 @@
+1 + USB data transfers occur through a series of events called transactions.
+2 + Transactions are conducted within a Host-controlled time interval called a frame.
+    The length and frequency of the transactions depends upon the *Transfer Type* being used for an endpoint.
+3 + The type of transfer which can be sent in a frame, and the frame length is defined by the specified USB speed.
 
+
+
+
+
+
+
+
+
+=====================================================================================================================
 
 # USB Enumeration :[...](https://microchipdeveloper.com/usb:enumeration)
   Enumeration is the process whereby the Host detects the presence of a Device and takes the necessary steps to ensure 
