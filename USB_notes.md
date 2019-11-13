@@ -33,7 +33,16 @@
   using the active configuration.
   
   
-**=====================================================================================**
+  
+# [Control Commands for USB Devices](https://microchipdeveloper.com/usb:control-commands)
+
+  
+  
+  
+  
+  
+  
+**================================================================================**
 
 # Commonly used USB Speed Specifications :
   ![alt text](https://www.electronicdesign.com/sites/electronicdesign.com/files/uploads/2015/02/0216_TI_USBtypeC_No2_Table1.gif)
