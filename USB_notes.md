@@ -33,8 +33,25 @@
 [Also See](https://www.keil.com/pack/doc/mw/USB/html/pipemodel.png)
 
 
++ Token Packet :
+![alt text](https://engineersgarag.wpengine.com/wp-content/uploads/2019/07/Image-Showing-Data-Format-Token-Packets.png)
 
-6. **USB Descriptors** :
++ Data Packet :
+![alt Text](https://engineersgarag.wpengine.com/wp-content/uploads/2019/07/Image-Showing-Data-Format-Data-Packets.png)
+
++ HandShake Packet :
+![alt text](https://engineersgarag.wpengine.com/wp-content/uploads/2019/07/Image-Showing-Data-Format-Handshake-Packets.png)
+
++ Start OF Frame :
+![alt text](https://engineersgarag.wpengine.com/wp-content/uploads/2019/07/Image-Showing-Data-Format-Start-Frame-Packets-SOF.png)
+
+
+
+
+#### USB Packet Fields [See](https://www.engineersgarage.com/tutorials/usb-protocol-types-of-usb-packets-and-usb-transfers-part-2-6/)
+
+
+6. **USB Descriptors** : [See...](https://www.engineersgarage.com/article_page/usb-descriptors-and-their-types-part-3-6/)
                    
                     Each Universal Serial Bus (USB) Device has a set of descriptors.
                     The descriptors are read by the Host during enumeration. Descriptors inform
@@ -102,6 +119,37 @@ The most commonly used descriptors include:
 10. **Control Commands for USB Devices** : [See](https://microchipdeveloper.com/usb:control-commands)
 
     
+11. The Control Transfer is the only transfer type which is supported even when the device is yet not configured.
+the Control Transfer consists of three transactions –
+[See](https://www.engineersgarage.com/tutorials/usb-requests-and-stages-of-control-transfer-part-4-6/)
+
++ Setup transaction,
++ Data transaction (optional) and
++ Status transaction
+
+![alt text](https://engineersgarag.wpengine.com/wp-content/uploads/2019/07/Image-Showing-Data-Format-USB-Control-Transfer.png)
+
+
+12. Standard USB Requests : [See](https://www.engineersgarage.com/tutorials/usb-requests-and-stages-of-control-transfer-part-4-6/)
+    + GET_STATUS :
+    + SET_FEATURE/CLEAR_FEATURE:
+    + DEVICE_REMOTE_WAKEUP
+    + SET_ADDRESS
+    + GET_DESCRIPTOR
+    + SET_DESCRIPTOR: 
+    + SET_CONFIGURATION
+    + GET_CONFIGURATION
+    + SET_INTERFACE
+    + GET_INTERFACE
+    + SYNCH_FRAME
+    
+    
+ 13. Validity of Requests : [See](https://www.engineersgarage.com/tutorials/usb-requests-and-stages-of-control-transfer-part-4-6/)
+ 
+ 14.  
+        
+    
+   
   
   
 **=============================================================================**
