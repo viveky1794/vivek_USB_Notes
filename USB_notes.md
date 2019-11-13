@@ -1,6 +1,6 @@
 
 
-# USB Enumeration :[Raw Link](https://microchipdeveloper.com/usb:enumeration)
+# USB Enumeration :[...](https://microchipdeveloper.com/usb:enumeration)
   Enumeration is the process whereby the Host detects the presence of a Device and takes the necessary steps to ensure 
   that the Device endpoints are added to the list of endpoints serviced by the Host.
   
