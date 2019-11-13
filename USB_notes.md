@@ -34,7 +34,7 @@
   
   
   
-# [Control Commands for USB Devices](https://microchipdeveloper.com/usb:control-commands)
+# Control Commands for USB Devices [...](https://microchipdeveloper.com/usb:control-commands)
 
   
   
