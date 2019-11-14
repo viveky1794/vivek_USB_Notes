@@ -89,7 +89,7 @@ The most commonly used descriptors include:
    + **Device Enumeration States** :
   ![alt text](https://microchip.wikidot.com/local--files/usb:enumeration/device-states.svg)
   
-## Device Detection :
+   + **Device Detection :**
   The presence of a newly installed Full Speed, High Speed or Low Speed Device is recognized
   by changes in the D- or D+ signal. A low-speed device places 5 V on D-, high- and full-speed
   devices assert 5 V on D+ . The connection signals are detected by the Hub and reported to the Host.
@@ -100,17 +100,17 @@ The most commonly used descriptors include:
 + [Resume Command](https://microchipdeveloper.com/usb:reset-suspend-resume)
  
 
-## Default State :
+   + **Default State :**
   When a RESET control signal sequence is received, the Device will manage its load, per specification, to enumerate.
   If the attached Device is a High Speed device a “chirp” will be returned and the High Speed detection process will
   be completed. Once the speed has been settled the Host reads the Device descriptor and assigns an address
   
-## Addressed State :
+   + **Addressed State :**
   After setting the address the Host reads all remaining descriptor tables for the device. If a Host determines 
   it can service the Device’s interface endpoints and provide sufficient power, the Host issues a command informing
   the Device which of its configurations to activate.
   
-## Configured State :
+   + **Configured State :**
   After receiving notification from the Host regarding which configuration to activate, the Device is ready to run 
   using the active configuration.
   
