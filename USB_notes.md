@@ -147,6 +147,24 @@ the Control Transfer consists of three transactions –
  13. Validity of Requests : [See](https://www.engineersgarage.com/tutorials/usb-requests-and-stages-of-control-transfer-part-4-6/)
  
  14.  **Signal and Encoding of USB System** : [See](https://www.engineersgarage.com/tutorials/signal-and-encoding-of-usb-system-part-5-6/)
+ 
+ + Differential 0 and Differential 1:
+ + Single Ended Zero
+ + Single Ended One:
+ + idle
+ + Data J and Data K
+ + Start of Packet:
+ + End of Packet
+ + Disconnect
+ + connect
+ + Keep Alive Signal
+ + Suspend State:
+ + Resume:
+ + Reset State:
+ + Detached State:
+ + Attached State:
+ + Encoding Scheme
+ + Bit stiffing
         
     
    
