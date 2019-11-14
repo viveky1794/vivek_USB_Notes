@@ -146,7 +146,7 @@ the Control Transfer consists of three transactions –
     
  13. Validity of Requests : [See](https://www.engineersgarage.com/tutorials/usb-requests-and-stages-of-control-transfer-part-4-6/)
  
- 14.  
+ 14.  **Signal and Encoding of USB System** : [See](https://www.engineersgarage.com/tutorials/signal-and-encoding-of-usb-system-part-5-6/)
         
     
    
