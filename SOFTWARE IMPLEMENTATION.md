@@ -20,3 +20,7 @@
    
    
    + Using WDF to Develop a Driver
+   
+   
+   ## Raw USB Descriptor Capture
+   [Link](https://www.thesycon.de/eng/usb_descriptordumper.shtml)
