@@ -12,6 +12,8 @@
 
 +   https://microchipdeveloper.com/usb:enumeration
 
++   [BOOK--LDD3](https://www.oreilly.com/library/view/linux-device-drivers/0596005903/ch13.html)
+
 
 +   Token Packet
  +   Start of Frame packet
