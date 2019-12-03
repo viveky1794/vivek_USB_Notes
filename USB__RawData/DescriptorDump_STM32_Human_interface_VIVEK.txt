@@ -1,0 +1,87 @@
+Information for device STM32 Human interface_VIVEK (VID=0x0483 PID=0x572B):
+
+Connection Information:
+------------------------------
+Device current bus speed: FullSpeed
+Device address: 0x0005
+Current configuration value: 0x00
+Number of open pipes: 0
+
+Device Descriptor:
+------------------------------
+0x12	bLength
+0x01	bDescriptorType
+0x0200	bcdUSB
+0x07	bDeviceClass      (Printer Device Class)
+0x01	bDeviceSubClass   
+0x02	bDeviceProtocol   
+0x40	bMaxPacketSize0   (64 bytes)
+0x0483	idVendor
+0x572B	idProduct
+0x0200	bcdDevice
+0x01	iManufacturer   "STMicroelectronics_VIVEK"
+0x02	iProduct   "STM32 Human interface_VIVEK"
+0x03	iSerialNumber   "00000000001A"
+0x01	bNumConfigurations
+
+Configuration Descriptor:
+------------------------------
+0x09	bLength
+0x02	bDescriptorType
+0x0022	wTotalLength   (34 bytes)
+0x01	bNumInterfaces
+0x01	bConfigurationValue
+0x00	iConfiguration
+0xE0	bmAttributes   (Self-powered Device, Remote-Wakeup)
+0x32	bMaxPower      (100 mA)
+
+Interface Descriptor:
+------------------------------
+0x09	bLength
+0x04	bDescriptorType
+0x00	bInterfaceNumber
+0x00	bAlternateSetting
+0x01	bNumEndPoints
+0x00	bInterfaceClass      
+0x01	bInterfaceSubClass   
+0x00	bInterfaceProtocol   
+0x00	iInterface
+
+Unknown Descriptor:
+------------------------------
+0x09	bLength
+0x21	bDescriptorType
+Hex dump: 
+0x09 0x21 0x11 0x01 0x00 0x01 0x22 0x4A 0x00 
+
+Endpoint Descriptor:
+------------------------------
+0x07	bLength
+0x05	bDescriptorType
+0x81	bEndpointAddress  (IN endpoint 1)
+0x03	bmAttributes      (Transfer: Interrupt / Synch: None / Usage: Data)
+0x0004	wMaxPacketSize    (1 x 4 bytes)
+0x0A	bInterval         (10 frames)
+
+Microsoft OS Descriptor is not available. Error code: 0x0000001F
+
+String Descriptor Table
+--------------------------------
+Index  LANGID  String
+0x00   0x0000  0x0409 
+0x01   0x0409  "STMicroelectronics_VIVEK"
+0x02   0x0409  "STM32 Human interface_VIVEK"
+0x03   0x0409  "00000000001A"
+
+------------------------------
+
+Connection path for device: 
+Intel(R) 8 Series USB Enhanced Host Controller #1 - 9C26
+Root Hub
+Generic USB Hub
+Generic USB Hub
+STM32 Human interface_VIVEK (VID=0x0483 PID=0x572B) Port: 4
+
+Running on: Windows 7 with Service Pack 1
+
+Brought to you by TDD v2.12.0, Aug  2 2019, 16:35:05
