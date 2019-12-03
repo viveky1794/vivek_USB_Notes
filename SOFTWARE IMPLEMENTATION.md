@@ -12,7 +12,7 @@
 
 +   https://microchipdeveloper.com/usb:enumeration
 
-+   [BOOK--LDD3](https://www.oreilly.com/library/view/linux-device-drivers/0596005903/ch13.html)
++   [BOOK--LDD3-->>>USB Driver](https://www.oreilly.com/library/view/linux-device-drivers/0596005903/ch13.html)
 
 
 +   Token Packet
