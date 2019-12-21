@@ -122,6 +122,20 @@
         0xC0                // end collection
 		
 /*========================================================================================*/
+
+
+	>>>>	DescriptorsTypes		      	|	values  |
+	`````````````````````````````````````````````````````````
+		1:	Device				           		|	  1			|
+		2:	Configration			         	|	  2			|
+		3:	String					           	|	  3			|
+		4:	Interface				          	|	  4			|
+		5:	Endpoint				           	|	  5			|
+		6:	Device_Qualifier		      	|	  6			|
+		7:	Other_Speed_Configuration	  |	  7			|
+		8:	InterFace_Power			      	|	  8			|
+	``````````````````````````````````````````````````````````
+/*========================================================================================*/
 	>>>>	Standard Descriptors :	<<<<
 	
 	struct Device_Descriptor
