@@ -149,6 +149,7 @@
 			uint8_t		MaxPacketSize0;
 			uint16_t	idVendor;
 			uint16_t	idProduct;
+			
 			uint16_t	bcdDevice;
 			uint8_t		iManufacturer;
 			uint8_t		iProduct;
