@@ -1,0 +1,195 @@
+
+/**********************		TEST ON USB		*******************************/
+
+	@@	:	TEST_USART
+			***********
+			*	This File deals with USART funcationality of STM32F103C8
+				MicroController.
+			*	We are receiving data serially and Sending it back.
+			
+	@@	:	Test_USB_VCP_Serial_Communication
+			**********************************
+			*	This File deals with USB Virtual Cummunication Protocol.
+			*	We are able to send Data on COM Port.
+			*	Not able to receive data. Don't KNOW. WHY ?
+
+	@@	:	Test_USB_Mouse
+			***************
+			*	This File Deals with USB Human InterFace Class
+				acting as Mouse.
+			
+	@@	:	Test_USB_KeyBoard_2
+			********************
+			*	This File deals with USB HID class acting as KeyBoard.
+			*	Able to Send Key values and Print On Linux terminal.
+			*	it is not able to Capture Output Report Coming From
+				Windows.
+			*	
+				
+	@@	:	Working Custom HID KeyBoard
+			****************************
+			*	This File deals with USB Custom HID class acting as KeyBoard.
+			*	Able to Send Key Values and Print on Linux terminal.
+			*	IT is able to Capture Output Report Coming From Windows.
+			*	This File have Some more Funcationality other than HID
+				class in STM32F103C8. So it can Capture Output report
+				and Blink GPIO_PIN_13 LED. When Ever we press the Caps Lock
+				Key at our Keyboard.
+			
+	@@	:	USB_Project_3
+			*************
+			*	This File belongs to Project Catagory and Working Example of 
+			*	Weight Mechine completly written by me. IT is Working under
+				USB HID class.
+			*	we are able to receive Pitney Bowes ( POS ) data on Linux
+				with the Help of Python3 Script. 
+				We mimic this Point of Scale(POS) and our Controller(STM32F103C8)
+				acts like this.
+
+	@@	:	USB_RawData
+			***********
+			*	This File Contains RAW descriptors of many devices like
+				KeyBoard, Mouse, Pitney Bowes etc.
+			*	It is Used in Reverse Engineering to make Descriptors.
+
+/@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@/
+
+/****************************	Important Points	*************************/
+
+	@@	:	There are Few Descriptors in USB Protocol. We must take care.
+			
+			**	Device Decriptor
+			**	Configration Descriptors
+			**	Interfernce Descriptors
+			**	Endpoint Descriptors.
+			**	Report Descriptors
+			
+			Interfernce Descriptors and Endpoint Descriptors works in pairs
+			These two Descriptors decide where do we take data to send/receive.
+			
+			Report Descriptor is very Important on the Bases of this Descriptor
+			we make our Custom HID devices with the Help of USB protocol.
+			
+			
+	@@	:	Tags Related INFO #Report Descriptor
+			
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			0X05 , 0x	/* 	USAGE_PAGE() 					*/
+			0X09 , 0X0	/*	USAGE()							*/			
+			0XA1 , 0X0	/*	COLLECTION(APPLICATION)			*/	
+			0X15 , 0X0	/*	LOGIACL MINIMUM()				*/
+			0X25 , 0X0	/*	LOGIACL MAXIMUM()				*/
+			0X19 , 0X0	/*	UASAGE MINIMUM()				*/
+			0X29 , 0X0	/*	UASAGE MAXIMUM()				*/
+			0X85 , 0X0	/*	REPORT ID()						*/
+			0X95 , 0X0	/*	REPORT COUNT()					*/
+			0X75 , 0X0	/*	REPORT SIZE()					*/
+			0X81 , 0X0	/*	INPUT()							*/
+			0X91 , 0X0	/*	Output()						*/
+			0xC0        /*  END COLLECTION()				*/
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
+			
+	@@	: 
+			#define LED_NUM_LOCK			0x01
+			#define LED_CAPS_LOCK			0x02
+			#define LED_SCROLL_LOCK			0x04
+
+/*========================================================================================*/
+
+	>>>>	Report descriptor : Demo	<<<<
+	
+	0x06, 0x00, 0xff,   // usage page (vendor defined)
+        0x09, 0x01,         // usage (vendor page 1)
+        0xA1, 0x01,         // Collection application
+            0x09, 0x01,         // usage (vendor page 1)
+        
+            0x85, 0x04,         //report id 4
+            0x95, input_length, // report count
+            0x75, 0x08,         // report size = 8 bits
+            0x26, 0xFF, 0x00,   // logical maximum = 255
+            0x15, 0x00,         // logical minimum = 0
+            0x09, 0x01,         // usage (vendor page 1)
+            0x81, 0x02,         // Input (array)
+            
+            0x85, 0x05,         //report id 5
+            0x95, output_length,// report count
+            0x75, 0x08,         // report size = 8 bits
+            0x26, 0xFF, 0x00,   // logical maximum = 255
+            0x15, 0x00,         // logical minimum = 0
+            0x09, 0x01,         // usage (vendor page 1)
+            0x91, 0x02,         // Output (array)
+        0xC0                // end collection
+		
+/*========================================================================================*/
+	>>>>	Standard Descriptors :	<<<<
+	
+	struct Device_Descriptor
+		{
+			uint8_t 	bLength;
+			uint8_t 	bDescriptorType
+			uint16_t 	bcdUSB;
+			uint8_t 	bDeviceClass;
+			uint8_t 	DeviceSubClass;
+			uint8_t		bDeviceProtocol;
+			uint8_t		MaxPacketSize0;
+			uint16_t	idVendor;
+			uint16_t	idProduct;
+			uint16_t	bcdDevice;
+			uint8_t		iManufacturer;
+			uint8_t		iProduct;
+			uint8_t		iSerialNumber;
+			uint8_t		bNumConfigrations;
+			
+		};
+		
+	struct Device_Qualifier
+		{
+			uint8_t 	bLength;
+			uint8_t 	bDescriptorType
+			uint16_t 	bcdUSB;
+			uint8_t 	bDeviceClass;
+			uint8_t 	DeviceSubClass;
+			uint8_t		bDeviceProtocol;
+			uint8_t		MaxPacketSize0;
+			uint8_t		bNumConfigrations;
+			uint8_t		bReserved;
+		};		
+		
+	struct Configuration_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint16_t	bTotalLength;
+			uint8_t		bNumInterfaces;
+			uint8_t		bConfigurationValue;
+			uint8_t		iConfiguration;
+			uint8_t		bmAttributes;
+			uint8_t		bMaxpower;
+		};
+		
+	struct 	InterFace_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint8_t		bInterfaceNumber;
+			uint8_t		bAlternayeSetting;
+			uint8_t		bNumEndpoints;
+			uint8_t		bInterfaceClass;
+			uint8_t		bInterfaceSubClass;
+			uint8_t		bInterfaceProtocol;
+			uint8_t		iInterface;
+		};
+		
+		
+	struct Endpoint_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint8_t 	bEndpointAddress;
+			uint8_t		bmAttributes;
+			uint16_t	wMaxPacketSize;
+			uint8_t		bInterval;
+		};
+	
+	
