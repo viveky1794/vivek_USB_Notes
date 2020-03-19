@@ -1,0 +1,889 @@
+
+	@Auther			: 	Vivek Yadav
+	@Date			:	3/01/2020
+	@Brief			:	USB Notes for practical Usages. It will guide you to learn USB protocol from Scratch.
+	@Requirements 	:	
+						1 : STM32F103C8T6 Microcontroller
+						2 : C langauge and Python3.x
+						3 : Keil v5
+						4 : STMCubeMX 
+						5 : WireShark
+						6 : Linux(UBUNTU ) and Windows 7(I worked on )
+	@Resources		:	
+						Links :
+							>>	https://www.reddit.com/r/learnpython/comments/3z346p/reading_a_usb_data_stream_on_windows/
+							>>	https://community.st.com/s/question/0D50X00009Xkh3g/usb-hid-keyboard-leds
+							>>	https://github.com/flabbergast/chibios-projects/blob/e8a5f7452d9922e6e486739f679de2eb85dac05c/projects/keyb/usb_main.c#L825-L840
+							>>	https://community.st.com/s/question/0D50X00009XkX4a/stm32f103-usb-device-get-report
+		
+	
+	@Preface		:
+						1# What should you know about USB Protocol ?
+						2# Some Thought on Report Descriptor.
+						3# How do we get These Descriptors ?	
+						4# How to manage Hardware.
+						5#  Python Scipts 
+						
+
+
+######################################################################################################################################################################
+######################################################################################################################################################################
+	
+	1# What should you know about USB Protocol ?
+	
+	>>	Theory points :
+			>>	: USB has many class
+				  1 : CDC
+				  2 : Audio
+				  3	: HID
+				  4 : Custom HID,Composite HID
+					
+					@we will focus on HID/Custom HID Class.
+	
+			>>	: UBS Protocol has many Structures also know as Descriptors.
+				  Some Important Descriptors are as following. 
+				  To Know more about Descriptors Please refere USB Protocol References on USB.org Website.
+			
+				>>>>	DescriptorsTypes			|	values		|
+				`````````````````````````````````````````````````````````
+					1:	Device						|	1			|
+					2:	Configration				|	2			|
+					3:	String						|	3			|
+					4:	Interface					|	4			|
+					5:	Endpoint					|	5			|
+					6:	Device_Qualifier			|	6			|
+					7:	Other_Speed_Configuration	|	7			|
+					8:	InterFace_Power				|	8			|
+	/*********************************************************************************************/		
+			
+			>>>>	Standard Descriptors :	<<<<
+	
+	struct Device_Descriptor
+		{
+			uint8_t 	bLength;
+			uint8_t 	bDescriptorType
+			uint16_t 	bcdUSB;
+			uint8_t 	bDeviceClass;
+			uint8_t 	DeviceSubClass;
+			uint8_t		bDeviceProtocol;
+			uint8_t		MaxPacketSize0;
+			uint16_t	idVendor;
+			uint16_t	idProduct;
+			uint16_t	bcdDevice;
+			uint8_t		iManufacturer;
+			uint8_t		iProduct;
+			uint8_t		iSerialNumber;
+			uint8_t		bNumConfigrations;
+			
+		};
+	/*********************************************************************************************/	
+	struct Device_Qualifier
+		{
+			uint8_t 	bLength;
+			uint8_t 	bDescriptorType
+			uint16_t 	bcdUSB;
+			uint8_t 	bDeviceClass;
+			uint8_t 	DeviceSubClass;
+			uint8_t		bDeviceProtocol;
+			uint8_t		MaxPacketSize0;
+			uint8_t		bNumConfigrations;
+			uint8_t		bReserved;
+		};		
+	/*********************************************************************************************/	
+	struct Configuration_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint16_t	bTotalLength;
+			uint8_t		bNumInterfaces;
+			uint8_t		bConfigurationValue;
+			uint8_t		iConfiguration;
+			uint8_t		bmAttributes;
+			uint8_t		bMaxpower;
+		};
+	/*********************************************************************************************/	
+	struct 	InterFace_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint8_t		bInterfaceNumber;
+			uint8_t		bAlternayeSetting;
+			uint8_t		bNumEndpoints;
+			uint8_t		bInterfaceClass;
+			uint8_t		bInterfaceSubClass;
+			uint8_t		bInterfaceProtocol;
+			uint8_t		iInterface;
+		};
+		
+	/*********************************************************************************************/	
+	struct Endpoint_Descriptor
+		{
+			uint8_t		bLength;
+			uint8_t		bDescriptorType;
+			uint8_t 	bEndpointAddress;
+			uint8_t		bmAttributes;
+			uint16_t	wMaxPacketSize;
+			uint8_t		bInterval;
+		};
+	
+			>>	:	ENDPOINTs are two Types One is IN endpoint and Other is OUT endpoint.
+					In/OUT endpoints are With respect to HOST device.
+					
+			>>  : 	Interfernce Descriptors and Endpoint Descriptors works in pairs
+					These two Descriptors decide where do we take data to send/receive.
+	/*********************************************************************************************/
+	
+//===================================================================================================//
+
+/*
+	Device Descriptor:
+------------------------------
+*/		
+	0x12,                       /*bLength */
+    USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
+    0x00,                       /* bcdUSB */  
+    0x02,
+    0x00,                       /*bDeviceClass*/
+    0x00,                       /*bDeviceSubClass*/
+    0x00,                       /*bDeviceProtocol*/
+    USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
+    LOBYTE(USBD_VID),           /*idVendor*/
+    HIBYTE(USBD_VID),           /*idVendor*/
+    LOBYTE(USBD_PID_FS),           /*idVendor*/
+    HIBYTE(USBD_PID_FS),           /*idVendor*/
+    0x00,                       /*bcdDevice rel. 2.00*/
+    0x02,
+    USBD_IDX_MFC_STR,           /*Index of manufacturer  string*/
+    USBD_IDX_PRODUCT_STR,       /*Index of product string*/
+    USBD_IDX_SERIAL_STR,        /*Index of serial number string*/
+    USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/		
+		
+/*
+	Configuration Descriptor:
+------------------------------
+*/
+0x09,	//bLength
+0x02,	//bDescriptorType
+0x22,	//wTotalLength   (34 bytes)
+0x00,
+0x01,	//bNumInterfaces
+0x01,	//bConfigurationValue
+0x00,	//iConfiguration
+0xE0,	//bmAttributes   (Bus-powered Device, Remote-Wakeup)
+0x32,	//bMaxPower      (100 mA)
+
+/*
+Interface Descriptor:
+------------------------------
+*/
+	
+0x09,	//bLength
+0x04,	//bDescriptorType
+0x00,	//bInterfaceNumber
+0x00,	//bAlternateSetting
+0x01,	//bNumEndPoints
+0x03,	//bInterfaceClass      (Human Interface Device Class)
+0x01,	//bInterfaceSubClass  (0: No boot , 1: Boot ) 
+0x03,	//bInterfaceProtocol  (1: KeyBoard , 2: Mouse)
+0x00,	//iInterface
+
+/*
+HID Descriptor:
+------------------------------
+*/
+
+0x09,	//bLength
+0x21,	//bDescriptorType
+0x11,
+0x01,	//bcdHID
+0x00,	//bCountryCode
+0x01,	//bNumDescriptors
+0x22,	//bDescriptorType   (Report descriptor)
+USBD_CUSTOM_HID_REPORT_DESC_SIZE,	//bDescriptorLength(65 Bytes) OR Size of REPORT Descriptors
+0x00,
+
+/*
+Endpoint Descriptor: -- IN ENDPOINT
+------------------------------
+*/
+
+0x07,	//bLength
+0x05,	//bDescriptorType
+0x81,	//bEndpointAddress  (IN endpoint 1)
+0x03,	//bmAttributes      (Transfer: Interrupt / Synch: None / Usage: Data)
+0x08,	//wMaxPacketSize    (1 x 8 bytes)
+0x00,
+0x0F,	//bInterval         (16 Milli Sec) it is Polloing Interval which can be Adjustable
+	
+//===================================================================================================//	
+
+
+######################################################################################################################################################################
+######################################################################################################################################################################	
+	
+	2#	:	Every USB HID class device need Report Descriptors. This Report Descriptors tells
+			Operating System that How a device act like(i.e Keyboard, Mouse, Point Of Scales... etc).
+			To know more about Report Descriptors Please Read Official documents.
+			
+			Example that how A report Descriptors Look like. A Report Descriptors works into key-values
+			pair. Where first Bytes tell about next byte to OS Driver.
+			
+			It is important to give Report ID when you are making composite custom HID(keyboard + Mouse + Other...).
+				It is also important that keyboard must have REPORT ID(2) and Mouse REPORT ID(1) in Windows.
+				when you are making composite HID and Report IDs must be unique.
+				and keyboard msut have only total 8 Byte report.
+					i.e
+/*															 KEYBOARD REPORT:
+
+Byte |	Bit 7   |	Bit 6   |   Bit 5     |  	Bit 4     | Bit 3    |	Bit 2   |  Bit 1     |	Bit 0       |
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  0  |Right GUI | Right Alt | Right Shift | Right Control | Left GUI | Left Alt | Left Shift | Left Control |		
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  1  |										RESERVE													
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  2  |										KEYBOARD VALUE_1
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  3  |										KEYBOARD VALUE_2
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  4  |										KEYBOARD VALUE_3
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  5  |										KEYBOARD VALUE_4
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  6  |										KEYBOARD VALUE_5
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+  7  |										KEYBOARD VALUE_6
+-----+----------+-----------+-------------+---------------+----------+----------+------------+--------------+-
+*/
+					  struct report{
+   									   uint8_t   reportID; // REPORT_ID(2) For KeyBoard
+									   uint8_t   modifier;
+									   uint8_t   reserved;
+									   uint8_t   keycode[5];
+									
+									}keyboard_report_t;
+									
+									
+									
+						
+					
+			@ If you are making only KeyBoard or Mouse then There is no need of Report ID.
+			
+						struct report{
+   									   //uint8_t   reportID;
+									   uint8_t   modifier;
+									   uint8_t   reserved;
+									   uint8_t   keycode[6];
+									
+									}keyboard_report_t;
+			
+			
+				Tags Related INFO #Report Descriptor
+			
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			0X05 , 0x	/* 	USAGE_PAGE() 					*/
+			0X09 , 0X0	/*	USAGE()							*/			
+			0XA1 , 0X0	/*	COLLECTION(APPLICATION)			*/	
+			0X15 , 0X0	/*	LOGIACL MINIMUM()				*/
+			0X25 , 0X0	/*	LOGIACL MAXIMUM()				*/
+			0X19 , 0X0	/*	UASAGE MINIMUM()				*/
+			0X29 , 0X0	/*	UASAGE MAXIMUM()				*/
+			0X85 , 0X0	/*	REPORT ID()						*/
+			0X95 , 0X0	/*	REPORT COUNT()					*/
+			0X75 , 0X0	/*	REPORT SIZE()					*/
+			0X81 , 0X0	/*	INPUT()							*/
+			0X91 , 0X0	/*	Output()						*/
+			0xC0        /*  END COLLECTION()				*/
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
+			i.e :
+			
+				>>>>	Report descriptor : Demo	<<<<
+	
+					0x06, 0x00, 0xff,   // usage page (vendor defined)
+						0x09, 0x01,         // usage (vendor page 1)
+						0xA1, 0x01,         // Collection application
+							0x09, 0x01,         // usage (vendor page 1)
+						
+							0x85, 0x04,         //report id 4
+							0x95, input_length, // report count
+							0x75, 0x08,         // report size = 8 bits
+							0x26, 0xFF, 0x00,   // logical maximum = 255
+							0x15, 0x00,         // logical minimum = 0
+							0x09, 0x01,         // usage (vendor page 1)
+							0x81, 0x02,         // Input (array)
+							
+							0x85, 0x05,         //report id 5
+							0x95, output_length,// report count
+							0x75, 0x08,         // report size = 8 bits
+							0x26, 0xFF, 0x00,   // logical maximum = 255
+							0x15, 0x00,         // logical minimum = 0
+							0x09, 0x01,         // usage (vendor page 1)
+							0x91, 0x02,         // Output (array)
+						0xC0                // end collection
+			
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					KeyBoard- REPORT Descriptor
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
+						
+		0x05 ,0x01, 		// Usage Page (Generic Desktop) 
+		0x09 ,0x06, 		// Usage (Keypad)
+		0xA1 ,0x01,			// Collection (Application)
+		0x05 ,0x07, 		// Usage (Keyboard)
+		0x85 ,0x02, 		// Report ID(2) window Keyboard understand this only	
+		0x19 ,0xE0, 		// Usage Minimum ()
+		0x29 ,0xE7, 		//  Usage Maximum ()
+		0x15 ,0x00, 		// Logical Minimum (0)
+		0x25 ,0x01, 		// Logical Maximum (1) 
+
+		0x75 ,0x01, 		// Report Size (1) 
+		0x95 ,0x08, 		// Report Count (8)  
+		0x81 ,0x02, 		// Input (Data, Variable, Absolute)
+		0x95 ,0x01, 		// Report Count (8) 
+			
+		0x75 ,0x08, 		// Report Size (1) 
+		0x81 ,0x01, 		// Input (Constant)
+		0x95 ,0x03, 		// Report Count (8) 
+		0x75 ,0x01, 		// Report Size (1) 
+			
+		0x05 ,0x08, 		// Usage Page (Page# for LEDs)
+		0x19 ,0x01, 		// Usage Minimum (01) 
+		0x29 ,0x03, 		// Usage Maximum (03)
+		0x91 ,0x02, 		// Output (Data, Variable, Absolute)
+
+		0x95 ,0x05, 		// Report Count (5) // composite USB HID device have only 5 input keys..which means the Total Size of of Report can be 8 Only
+		0x75 ,0x01, 		// Report Size (1)
+		0x91 ,0x01, 		// Output (Constant) 
+		0x95 ,0x05, 		// Report Count (6)
+
+		0x75 ,0x08, 		// Report Size (8)
+		0x15 ,0x00, 		//Logical Minimum (0)  
+		0x26 ,0xFF,0x00, // Logical Maximum (255)
+		0x05 ,0x07, 		// Usage (Key codes) 
+
+		0x19 ,0x00, 		// Usage Minimum (00)
+		0x2A ,0xFF,0x00, // Usage Maximum (255)
+		0x81 ,0x00, 		// Input (Data, Array)
+		0xC0 , 					// End Collection
+		
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					Mouse- REPORT Descriptor
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		0x05, 0x01, /* Usage Page (Generic Desktop)             */
+		0x09, 0x02, /* Usage (Mouse)                            */
+		0xA1, 0x01, /* Collection (Application)                 */
+		0x09, 0x01, /*  Usage (Pointer)                         */
+		0xA1, 0x00, /*  Collection (Physical)                   */
+		0x85, 0x01,  /*   Report ID  */
+		0x05, 0x09, /*      Usage Page (Buttons)                */
+		0x19, 0x01, /*      Usage Minimum (01)                  */
+		0x29, 0x03, /*      Usage Maximum (03)                  */
+		0x15, 0x00, /*      Logical Minimum (0)                 */
+		0x25, 0x01, /*      Logical Maximum (0)                 */
+		0x95, 0x03, /*      Report Count (3)                    */
+		0x75, 0x01, /*      Report Size (1)                     */
+		0x81, 0x02, /*      Input (Data, Variable, Absolute)    */
+		0x95, 0x01, /*      Report Count (1)                    */
+		0x75, 0x05, /*      Report Size (5)                     */
+		0x81, 0x01, /*      Input (Constant)    ;5 bit padding  */
+		0x05, 0x01, /*      Usage Page (Generic Desktop)        */
+		0x09, 0x30, /*      Usage (X)                           */
+		0x09, 0x31, /*      Usage (Y)                           */
+		0x15, 0x81, /*      Logical Minimum (-127)              */
+		0x25, 0x7F, /*      Logical Maximum (127)               */
+		0x75, 0x08, /*      Report Size (8)                     */
+		0x95, 0x02, /*      Report Count (2)                    */
+		0x81, 0x06, /*      Input (Data, Variable, Relative)    */
+		0xC0, 0xC0,/* End Collection,End Collection            */
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				
+			
+		>>>>	Pitney Bowes Report Descriptors Original		<<<<
+	
+	Usage Page (POS Scale),                 ; POS devices - scale (8Dh, POS page)
+Usage (20h),
+Collection (Application),
+    Usage (30h),
+    Collection (Logical),
+        Report ID (1),
+        Report Size (8),
+        Report Count (1),
+        Logical Minimum (1),
+        Usage (27h),
+        Collection (Logical),
+            Logical Maximum (10),
+            Usage Minimum (21h),
+            Usage Maximum (2Ah),
+            Feature,
+        End Collection,
+        Usage (50h),
+        Collection (Logical),
+            Logical Maximum (12),
+            Usage Minimum (51h),
+            Usage Maximum (5Ch),
+            Feature,
+        End Collection,
+    End Collection,
+    Usage (31h),
+    Collection (Logical),
+        Report ID (2),
+        Report Size (1),
+        Report Count (2),
+        Logical Minimum (0),
+        Logical Maximum (1),
+        Usage (81h),
+        Usage (80h),
+        Output (Variable),
+        Report Size (6),
+        Report Count (1),
+        Output (Constant, Variable),
+    End Collection,
+    Usage (32h),
+    Collection (Logical),
+        Report ID (3),
+        Report Size (8),
+        Logical Minimum (1),
+        Usage (70h),
+        Collection (Logical),
+            Logical Maximum (8),
+            Usage Minimum (71h),
+            Usage Maximum (78h),
+            Input,
+        End Collection,
+        Usage (50h),
+        Collection (Logical),
+            Logical Maximum (12),
+            Usage Minimum (51h),
+            Usage Maximum (5Ch),
+            Input,
+        End Collection,
+        Logical Minimum (-127),
+        Logical Maximum (127),
+        Usage (41h),
+        Input (Variable),
+        Report Size (16),
+        Logical Minimum (0),
+        Logical Maximum (65535),
+        Usage (40h),
+        Input (Variable),
+    End Collection,
+    Usage (34h),
+    Collection (Logical),
+        Report ID (5),
+        Report Size (8),
+        Report Count (1),
+        Usage (50h),
+        Collection (Logical),
+            Logical Minimum (1),
+            Logical Maximum (12),
+            Usage Minimum (51h),
+            Usage Maximum (5Ch),
+            Feature,
+        End Collection,
+        Logical Minimum (-127),
+        Logical Maximum (127),
+        Usage (41h),
+        Feature (Variable),
+        Report Size (16),
+        Logical Minimum (0),
+        Logical Maximum (65535),
+        Usage (40h),
+        Feature (Constant, Variable),
+    End Collection,
+    Usage (35h),
+    Collection (Logical),
+        Report ID (6),
+        Report Size (16),
+        Report Count (2),
+        Logical Minimum (0),
+        Logical Maximum (65535),
+        Usage (60h),
+        Usage (61h),
+        Feature (Constant, Variable),
+    End Collection,
+    Usage (30h),
+    Collection (Logical),
+        Report ID (7),
+        Report Size (8),
+        Report Count (15),
+        Logical Minimum (0),
+        Logical Maximum (127),
+        Usage (40h),
+        Feature (Variable),
+    End Collection,
+End Collection
+
+		>>>>	Pitney Bowes Report Descriptors Original :	HEX CODE 	<<<<
+		
+// 31 Bytes
+ 0x05 , 0x8D, // Usage Page (POS Scale); POS devices - scale (8Dh, POS page)
+ 0x09 , 0x20, // Usage (20h),
+ 0xA1 , 0x01, // Collection (Application),
+
+	 0x09 , 0x30, //  Usage (30h),		
+	 0xA1 , 0x02, //  Collection (Logical),
+	 0x85 , 0x01, //  Report ID (1),
+	 0x75 , 0x08, //  Report Size (8),
+	 0x95 , 0x01, //  Report Count (1),
+	 
+	 0x15 , 0x01, //  Logical Minimum (1),
+	 0x09 , 0x27, //  Usage (27h),
+	 0xA1 , 0x02, //  Collection (Logical),
+	 0x25 , 0x0A, //  Logical Maximum (10),
+	 
+	 0x19 , 0x21, //  Usage Minimum (21h),
+	 0x29 , 0x2A, //  Usage Maximum (2Ah),
+	 0xB1 , 0x00, //  Feature,
+	 0xC0,  	  //  End Collection,
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+	// 14 Bytes
+
+	 0x09 , 0x50, // Usage (50h),
+	 0xA1 , 0x02, // Collection (Logical),
+	 0x25 , 0x0C, // Logical Maximum (12),
+	 0x19 , 0x51, // Usage Minimum (51h),
+	 
+	 0x29 , 0x5C, //  Usage Maximum (5Ch),
+	 0xB1 , 0x00, //  Feature,
+	 0xC0 , 0xC0, //  End Collection,
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// 27 Bytes
+	 0x09 , 0x31, //  Usage (31h),
+	 0xA1 , 0x02, //  Collection (Logical),
+	 0x85 , 0x02, //  Report ID (2),
+	 0x75 , 0x01, //  Report Size (1),
+	 
+	 0x95 , 0x02, //  Report Count (2),
+	 0x15 , 0x00, //  Logical Minimum (0),
+	 0x25 , 0x01, //  Logical Maximum (1),
+	 0x09 , 0x81, //  Usage (81h),
+	 
+	 0x09 , 0x80, //  Usage (80h),
+	 0x91 , 0x02, //  Output (Variable),
+	 0x75 , 0x06, //  Report Size (6),
+	 0x95 , 0x01, //  Report Count (1),
+	 
+	 0x91 , 0x03, //  Output (Constant, Variable),
+	 0xC0 , 	  //   End Collection,
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// 23 Bytes  
+	 0x09 ,0x32, //  Usage (32h),
+	 0xA1 ,0x02, //  Collection (Logical),
+	 0x85 ,0x03, //  Report ID (3),
+	 0x75 ,0x08, //  Report Size (8),
+	 
+	 0x15 ,0x01, //  Logical Minimum (1),
+	 0x09 ,0x70, //  Usage (70h),
+	 0xA1 ,0x02, //  Collection (Logical),
+	 0x25 ,0x08, //  Logical Maximum (8),
+	 
+	 0x19 ,0x71, //  Usage Minimum (71h),
+	 0x29 ,0x78, //  Usage Maximum (78h),
+	 0x81 ,0x00, //  Input,
+	 0xC0 , 	 // End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 // 13 Bytes
+	 0x09 ,0x50, // Usage (50h),
+	 0xA1 ,0x02, // Collection (Logical
+	 0x25 ,0x0C, // Logical Maximum (12),
+	 0x19 ,0x51, // Usage Minimum (51h),
+	 0x29 ,0x5C, // Usage Maximum (5Ch),
+	 0x81 ,0x00, // Input,
+	 0xC0 , 	 // End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 // 22 Bytes
+	 0x15 ,0x81, //  Logical Minimum (-127),
+	 0x25 ,0x7F, //  Logical Maximum (127),
+	 0x09 ,0x41, //  Usage (41h),
+	 0x81 ,0x02, //  Input (Variable),
+	 0x75 ,0x10, //  Report Size (16),
+	 0x15 ,0x00, //  Logical Minimum (0),
+	 0x27 ,0xFF, 0xFF, 0x00, 0x00, //   Logical Maximum (65535),
+	 0x09 ,0x40, //  Usage (40h),
+	 0x81 ,0x02, //  Input (Variable),
+	 0xC0 , 	//   End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 // 25 Bytes
+	 0x09 ,0x34, //  Usage (34h),
+	 0xA1 ,0x02, //  Collection (Logical),
+	 0x85 ,0x05, //  Report ID (5),
+	 0x75 ,0x08, //  Report Size (8),
+	 0x95 ,0x01, //  Report Count (1),
+	 0x09 ,0x50, //  Usage (50h),
+	 0xA1 ,0x02, //  Collection (Logical),
+	 0x15 ,0x01, //  Logical Minimum (1),
+	 0x25 ,0x0C, //  Logical Maximum (12),
+	 0x19 ,0x51, //  Usage Minimum (51h),
+	 0x29 ,0x5C, //  Usage Maximum (5Ch),
+	 0xB1 ,0x00, //  Feature,
+	 0xC0 ,  	//   End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 // 22 Bytes
+	 0x15 ,0x81, //  Logical Minimum (-127),
+	 0x25 ,0x7F, //  Logical Maximum (127),
+	 0x09 ,0x41, //  Usage (41h),
+	 0xB1 ,0x02, //  Feature (Variable),
+	 0x75 ,0x10, //  Report Size (16),
+	 0x15 ,0x00, //  Logical Minimum (0),
+	 0x27 ,0xFF, 0xFF, 0x00, 0x00, // Logical Maximum (65535), 
+	 0x09 ,0x40, //  Usage (40h),
+	 0xB1 ,0x03, //  Feature (Constant, Variable),
+	 0xC0 , 	 //  End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 // 24 Bytes
+	 0x09 ,0x35, //  Usage (35h),
+	 0xA1 ,0x02, //  Collection (Logical),
+	 0x85 ,0x06, //  Report ID (6),
+	 0x75 ,0x10, //  Report Size (16),
+	 0x95 ,0x02, //  Report Count (2),
+	 0x15 ,0x00, //  Logical Minimum (0),
+	 0x27 ,0xFF, 0xFF, 0x00, 0x00, // Logical Maximum (65535), 
+	 0x09 ,0x60, //  Usage (60h),
+	 0x09 ,0x61, //  Usage (61h),
+	 0xB1 ,0x03, //  Feature (Constant, Variable),
+	 0xC0 , 	//   End Collection,
+ //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 //	20 Bytes
+	 0x09 ,0x30, // Usage (30h),
+	 0xA1 ,0x02, // Collection (Logical),
+	 0x85 ,0x07, // Report ID (7),
+	 0x75 ,0x08, // Report Size (8),
+	 0x95 ,0x0F, // Report Count (15),
+	 0x15 ,0x00, // Logical Minimum (0),
+	 0x25 ,0x7F, // Logical Maximum (127),
+	 0x09 ,0x40, // Usage (40h),
+	 0xB1 ,0x02, // Feature (Variable),
+	 0xC0 ,0xC0, // End Collection,
+
+/*	Total 221 Bytes		*/
+
+
+
+
+
+
+######################################################################################################################################################################
+######################################################################################################################################################################			
+			
+			
+	3# How do we get These Descriptors ?	
+		
+		>>	First Install/get Linux kernal Source Code which will help in many ways.
+			and explore it as much as you can specially hid and USB part.
+			
+		>>	To get any Report Descriptor like KEYBOARD,Mouse,Pitney Bowes or any other.
+			use usbhid-dump utility.which will help. It works only in Linux OS.
+			
+			/********************* Important Linux Commands for USB	***************************/
+	
+			:	sudo lshw -c input
+			:	lsusb
+			:	lsusb -v	
+			:	sudo lsusb -s 2:3 -v /* This command give you all Descriptors of any spefic usb device except Report Descriptor	*/
+			:	dmesg
+			:	sudo usbhid-dump -a2:3 -i0 | grep -v : | xxd -r -p | hidrd-convert -o spec 	/* This command give Report Descriptor in Human Readable Format	*/
+	
+		>>	Use WireShark software to bettter understand about Requests and Reponses between USB HOSTs and CLIENTs.
+			
+		>> To get Descriptors other than Report Descriptots. We can use Thesycon Software. Otherwise Linux is the Best Way.
+		   Use command : lsusb -v
+
+######################################################################################################################################################################
+######################################################################################################################################################################
+
+	4# How to manage Hardware.
+	
+	>>
+			|``````````````````|
+			|				   |
+			|				   |
+			| 	 LAPTOP      U |----------------->>Vbus 
+			|				 S |----------------->>D-
+			|				 B |----------------->>D+
+			|				   |----------------->>ID
+			|				   |----------------->>Gnd
+			|				   |
+			|``````````````````|
+	
+	
+							|~~~~~~~~~~~~~~~|
+							| STM32F103C8T6	|
+							|				|
+							|				|
+							|				|
+							|PA2			|
+							|PA3			|
+							|PA11(D-)		|
+							|PA12(D+)		|
+							|3/5v			|
+							|Gnd			|
+							|PC13			|
+							|LED			|
+							|				|
+							|3v				|
+							|SWIO			|
+							|SWCLK			|
+							|Gnd			|
+							|				|
+							|				|
+							|				|
+							|  Micro USB	|
+							|~~~~~~~~~~~~~~~|
+								| | | | |
+								| | | | |
+								| | | | |
+								| | | | |
+								| | | | |---->>Vbus
+								| |	| |------>>D-
+								| |	|--------->>D+
+								| |----------->>ID			
+								|------------->>Gnd
+								
+								
+								
+			@@	PA2 	-->> USART2 TX pin, Which is set on Baudrate 9600.
+			@@	PA3 	-->> USART2 RX pin, Which is set on Baudrate 9600.
+			@@	PA11 	-->> USB Data -ve pin OR internally connected with USB Header
+			@@	PA12 	-->> USB Data +ve pin OR internally connected with USB Header
+			@@	PC13	-->> internally connected with LED. I am using as indicator
+			@@	SWIO 	-->> Using this for Buring Program with the help of ST-LINK v.2
+			@@	SWCLK	-->> Using this for Buring Program with the help of ST-LINK v.2
+			@@	3/5v	-->> We are getting 3/5v supply from PC through USB cable.
+			@@	Vbus	-->> power suppy from Laptop.
+			@@	D-		-->> PA11
+			@@	D+		-->> PA12
+			@@	ID		-->> As per USB specification we need not worry about it.
+			@@	Gnd
+			@@	LEDs
+			
+			
+			
+		
+			
+			
+######################################################################################################################################################################
+######################################################################################################################################################################
+
+	5#  Python Scipts :
+		>>	Linux :
+				
+				import usb.core
+				import usb.util
+				import time
+
+				VENDOR_ID = 0x0D8F
+				PRODUCT_ID = 0x0200
+
+				#VENDOR_ID = 0x0483
+				#PRODUCT_ID = 0x5750
+
+				VENDOR_ID = 0x03F0
+				PRODUCT_ID = 0x0024
+
+				# find the USB device
+				device = usb.core.find(idVendor=VENDOR_ID, idProduct=PRODUCT_ID)
+
+				print("***************************************************")
+
+				print(device)
+
+				print("***************************************************")
+
+				if device.is_kernel_driver_active(0):
+						 device.detach_kernel_driver(0)
+
+
+				# use the first/default configuration
+				device.set_configuration()
+
+				# first endpoint
+				endpoint = device[0][(0,0)][0]
+				ep_addr = endpoint.bEndpointAddress
+				ep_msp = endpoint.wMaxPacketSize
+				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+				print(ep_addr)
+				print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+				# read a data packet
+				attempts = 100
+				data = None
+
+				#while data is None and attempts > 0:
+				while True:
+					print(data)
+					if data is not None:
+						data_list = data.tolist()
+						print("Total Weight  : ",( data_list[4] + data_list[5]*255 ) )
+						print(".................................................")
+
+					try:
+						data = device.read(ep_addr, ep_msp,1000)
+					   # timeout = 1000 mili_Sec to read the data
+
+					except usb.core.USBError as e:
+
+
+
+		>>	Windows 7
+		
+				import usb.core
+				import usb.util
+				import time
+
+				import pywinusb.hid as hid
+				from time import sleep
+
+				vendor_id = 0x0D8F # Pitney Bowes
+				product_id = 0x0200
+				devices = hid.HidDeviceFilter(vendor_id=vendor_id, product_id=product_id).get_devices()
+
+				def sample_handler(data):
+					print("Raw data: {0}".format(data))
+
+				if devices:
+					device = devices[0]
+					print ("success")
+
+					device.open()
+					device.set_raw_data_handler(sample_handler)
+					while device.is_plugged():
+						# just keep the device opened to receive events
+						buffer = [0x0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02]
+						device.send_output_report(buffer)
+						sleep(0.5)    
+
+######################################################################################################################################################################
+######################################################################################################################################################################
+
+
+	6#	Important Files need to be Care in STM32F103C8T6.
+			@@	main()
+				>> OUR logic implementation code will be here.
+				   *	we will declare HID Report structures.
+				   *	we will send reports from Here to HOST.
+				   *	Change USART2 baudrate(i.e 9600,115200).
+				   
+			@@	usbd_custom_hid_if.cable
+				>> Here We will write Report Descriptors.
+					*	funcation CUSTOM_HID_outEvent_FS
+						>>	write code to get Report from HOST(usally LOPTOP).
+						
+			@@	usbd_conf.h
+				>> change the Report descriptor Size.
+				
+			@@	usbd_desc.c
+				>> chnage the Vid,Pid, and Other Parameters accordinglly.
+				>> Change Device Descriptor
+				
+			@@	usbd_customhid.c
+				>> Change Descriptor....
+					*	Configuration Descriptor
+					*	InterFace Descriptor
+					*`	HID Descriptors
+					*	Endpoint Descriptor
+
+
+
+
